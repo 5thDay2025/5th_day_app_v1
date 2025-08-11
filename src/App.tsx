@@ -1,32 +1,20 @@
-import { useState } from 'react'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import './App.css'
-
-// Initialize Supabase client - only if environment variables are available
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-let supabase: SupabaseClient | null = null
-
-if (supabaseUrl && supabaseKey) {
-  supabase = createClient(supabaseUrl, supabaseKey)
-}
+import { AutonomyList } from './components/AutonomyList';
 
 function App() {
-  const [message] = useState('Welcome to React + Supabase!')
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>{message}</h1>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-        <p className="small">
-          {!supabase && 'Note: Supabase is not configured yet. Add your credentials to .env'}
-        </p>
-      </header>
+    <div>
+      <h1>5th Day App</h1>
+
+      <div>
+        <h2>Debug Info:</h2>
+        <p>React is running: ✅</p>
+        <p>Testing Supabase connection below:</p>
+      </div>
+      
+      <AutonomyList />
     </div>
-  )
+  );
 }
 
-export default App 
+export default App; 
