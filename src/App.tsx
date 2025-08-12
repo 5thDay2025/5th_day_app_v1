@@ -1,13 +1,28 @@
 import { AutonomyList } from './components/AutonomyList';
 import { Auth } from './components/Auth';
+import { ResetPassword } from './components/ResetPassword';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
+import { useEffect, useState } from 'react';
 
 function App() {
   const { user, loading } = useAuth();
+  const [isResetPassword, setIsResetPassword] = useState(false);
+
+  useEffect(() => {
+    // Check if we're on a password reset page
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+      setIsResetPassword(true);
+    }
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (isResetPassword) {
+    return <ResetPassword />;
   }
 
   if (!user) {

@@ -44,7 +44,7 @@ export const Auth: React.FC = () => {
     
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/5th_day_app_v1',
+        redirectTo: `${window.location.origin}/5th_day_app_v1/#/reset-password`,
       });
       
       if (error) throw error;
