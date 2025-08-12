@@ -7,39 +7,61 @@ export const ResetPassword: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
+
+  const addDebugInfo = (info: string) => {
+    setDebugInfo(prev => [...prev, info]);
+  };
 
   useEffect(() => {
     const setupSession = async () => {
       try {
+        // Log the full URL hash for debugging
+        const fullHash = window.location.hash;
+        addDebugInfo(`URL hash: ${fullHash}`);
+
         // Get all parameters from the URL
         const fragment = window.location.hash.substring(1);
         const params = new URLSearchParams(fragment);
+        
+        // Log what we found
+        const foundParams = Array.from(params.keys()).join(', ');
+        addDebugInfo(`Found parameters: ${foundParams}`);
+
+        // Check for recovery type
+        const type = params.get('type');
+        addDebugInfo(`Type parameter: ${type}`);
+
+        // Check for tokens
         const accessToken = params.get('access_token');
         const refreshToken = params.get('refresh_token');
-        const type = params.get('type');
+        addDebugInfo(`Has access token: ${!!accessToken}`);
+        addDebugInfo(`Has refresh token: ${!!refreshToken}`);
 
-        if (type !== 'recovery') {
-          setError('Invalid reset link');
-          return;
+        if (!type || type !== 'recovery') {
+          throw new Error('Invalid reset link type');
         }
 
-        if (!accessToken || !refreshToken) {
-          setError('Missing authentication tokens');
-          return;
+        if (!accessToken) {
+          throw new Error('Missing access token');
         }
 
         // Set the session
-        const { error } = await supabase.auth.setSession({
+        const { data, error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
-          refresh_token: refreshToken
+          refresh_token: refreshToken || ''
         });
 
-        if (error) {
-          throw error;
+        if (sessionError) {
+          throw sessionError;
         }
+
+        addDebugInfo('Session setup successful');
+
       } catch (error) {
-        console.error('Session setup error:', error);
-        setError('Failed to initialize password reset. Please try again.');
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        addDebugInfo(`Error: ${errorMessage}`);
+        setError(`Setup error: ${errorMessage}`);
       }
     };
 
@@ -57,11 +79,14 @@ export const ResetPassword: React.FC = () => {
     setError(null);
 
     try {
+      addDebugInfo('Attempting to update password...');
       const { error } = await supabase.auth.updateUser({
         password: password
       });
 
       if (error) throw error;
+      
+      addDebugInfo('Password updated successfully');
       setSuccess(true);
 
       // After 3 seconds, redirect to login
@@ -69,7 +94,9 @@ export const ResetPassword: React.FC = () => {
         window.location.href = '/5th_day_app_v1';
       }, 3000);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      addDebugInfo(`Password update error: ${errorMessage}`);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -176,6 +203,22 @@ export const ResetPassword: React.FC = () => {
         >
           {loading ? 'Updating Password...' : 'Update Password'}
         </button>
+
+        {/* Debug Information */}
+        <div style={{
+          marginTop: '20px',
+          padding: '10px',
+          backgroundColor: '#f5f5f5',
+          borderRadius: '4px',
+          fontSize: '12px',
+        }}>
+          <h3 style={{ margin: '0 0 8px 0' }}>Debug Info:</h3>
+          {debugInfo.map((info, index) => (
+            <div key={index} style={{ marginBottom: '4px' }}>
+              {info}
+            </div>
+          ))}
+        </div>
       </form>
     </div>
   );
