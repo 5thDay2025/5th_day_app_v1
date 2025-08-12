@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export const ResetPassword: React.FC = () => {
@@ -8,8 +8,27 @@ export const ResetPassword: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    // Get the access token from the URL
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    
+    if (accessToken) {
+      // Set the session with the access token
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: '',
+      });
+    }
+  }, []);
+
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
 
@@ -20,6 +39,11 @@ export const ResetPassword: React.FC = () => {
 
       if (error) throw error;
       setSuccess(true);
+
+      // After 3 seconds, redirect to login
+      setTimeout(() => {
+        window.location.href = '/5th_day_app_v1';
+      }, 3000);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
@@ -58,7 +82,7 @@ export const ResetPassword: React.FC = () => {
       }}>
         <h2>Password Updated!</h2>
         <p>Your password has been successfully reset.</p>
-        <p>You can now log in with your new password.</p>
+        <p>Redirecting to login page in 3 seconds...</p>
       </div>
     );
   }
@@ -83,6 +107,7 @@ export const ResetPassword: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               style={{
                 ...inputStyles,
                 paddingRight: '40px',
@@ -106,6 +131,13 @@ export const ResetPassword: React.FC = () => {
             >
               {showPassword ? '⊖' : '⊕'}
             </button>
+          </div>
+          <div style={{ 
+            fontSize: '12px', 
+            color: '#666', 
+            marginTop: '4px' 
+          }}>
+            Password must be at least 6 characters long
           </div>
         </div>
         {error && (
