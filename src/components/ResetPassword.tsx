@@ -9,17 +9,41 @@ export const ResetPassword: React.FC = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    // Get the access token from the URL
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get('access_token');
-    
-    if (accessToken) {
-      // Set the session with the access token
-      supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: '',
-      });
-    }
+    const setupSession = async () => {
+      try {
+        // Get all parameters from the URL
+        const fragment = window.location.hash.substring(1);
+        const params = new URLSearchParams(fragment);
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        const type = params.get('type');
+
+        if (type !== 'recovery') {
+          setError('Invalid reset link');
+          return;
+        }
+
+        if (!accessToken || !refreshToken) {
+          setError('Missing authentication tokens');
+          return;
+        }
+
+        // Set the session
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        console.error('Session setup error:', error);
+        setError('Failed to initialize password reset. Please try again.');
+      }
+    };
+
+    setupSession();
   }, []);
 
   const handleReset = async (e: React.FormEvent) => {
