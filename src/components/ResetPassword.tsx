@@ -16,34 +16,25 @@ export const ResetPassword: React.FC = () => {
   useEffect(() => {
     const setupSession = async () => {
       try {
-        // Log the full URL hash for debugging
-        const fullHash = window.location.hash;
-        addDebugInfo(`URL hash: ${fullHash}`);
+        // Log the full URL for debugging
+        const fullUrl = window.location.href;
+        addDebugInfo(`Full URL: ${fullUrl}`);
 
-        // Get all parameters from the URL
-        const fragment = window.location.hash.substring(1);
-        const params = new URLSearchParams(fragment);
-        
-        // Log what we found
-        const foundParams = Array.from(params.keys()).join(', ');
-        addDebugInfo(`Found parameters: ${foundParams}`);
-
-        // Check for recovery type
-        const type = params.get('type');
-        addDebugInfo(`Type parameter: ${type}`);
-
-        // Check for tokens
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
-        addDebugInfo(`Has access token: ${!!accessToken}`);
-        addDebugInfo(`Has refresh token: ${!!refreshToken}`);
-
-        if (!type || type !== 'recovery') {
-          throw new Error('Invalid reset link type');
+        // Check if we're on a recovery page
+        if (!fullUrl.includes('type=recovery')) {
+          throw new Error('Not a recovery page');
         }
 
+        // Get the tokens from the URL
+        const hashParams = new URLSearchParams(window.location.hash.replace('#', ''));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+
+        addDebugInfo(`Access token found: ${!!accessToken}`);
+        addDebugInfo(`Refresh token found: ${!!refreshToken}`);
+
         if (!accessToken) {
-          throw new Error('Missing access token');
+          throw new Error('No access token found');
         }
 
         // Set the session
@@ -207,14 +198,23 @@ export const ResetPassword: React.FC = () => {
         {/* Debug Information */}
         <div style={{
           marginTop: '20px',
-          padding: '10px',
-          backgroundColor: '#f5f5f5',
+          padding: '15px',
+          backgroundColor: '#f8f9fa',
           borderRadius: '4px',
-          fontSize: '12px',
+          fontSize: '14px',
+          border: '1px solid #dee2e6',
+          color: '#000',
         }}>
-          <h3 style={{ margin: '0 0 8px 0' }}>Debug Info:</h3>
+          <h3 style={{ margin: '0 0 12px 0', color: '#000' }}>Debug Info:</h3>
           {debugInfo.map((info, index) => (
-            <div key={index} style={{ marginBottom: '4px' }}>
+            <div 
+              key={index} 
+              style={{ 
+                marginBottom: '8px',
+                padding: '4px 0',
+                borderBottom: index < debugInfo.length - 1 ? '1px solid #dee2e6' : 'none'
+              }}
+            >
               {info}
             </div>
           ))}
