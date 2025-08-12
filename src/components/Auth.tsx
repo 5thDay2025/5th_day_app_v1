@@ -8,6 +8,7 @@ export const Auth: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [resetSent, setResetSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +25,31 @@ export const Auth: React.FC = () => {
       if (data && !isLogin) {
         alert('Check your email for the confirmation link!');
       }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Please enter your email address first');
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/5th_day_app_v1',
+      });
+      
+      if (error) throw error;
+      
+      setResetSent(true);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
@@ -49,6 +75,41 @@ export const Auth: React.FC = () => {
     cursor: loading ? 'not-allowed' : 'pointer',
     opacity: loading ? 0.7 : 1,
   };
+
+  const linkButtonStyles = {
+    background: 'none',
+    border: 'none',
+    color: '#007bff',
+    cursor: 'pointer',
+    padding: '0',
+    font: 'inherit',
+    textDecoration: 'underline',
+  };
+
+  if (resetSent) {
+    return (
+      <div className="auth-container" style={{
+        maxWidth: '400px',
+        margin: '40px auto',
+        padding: '20px',
+        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+        borderRadius: '8px',
+        textAlign: 'center',
+      }}>
+        <h2>Check Your Email</h2>
+        <p>We've sent you a password reset link. Please check your email.</p>
+        <button
+          onClick={() => {
+            setResetSent(false);
+            setError(null);
+          }}
+          style={linkButtonStyles}
+        >
+          Back to login
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-container" style={{
@@ -125,41 +186,39 @@ export const Auth: React.FC = () => {
           textAlign: 'center',
           marginTop: '8px',
           color: '#666',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
         }}>
           {isLogin ? (
-            <span>
-              Don't have an account?{' '}
-              <button
-                type="button"
-                onClick={() => setIsLogin(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#007bff',
-                  cursor: 'pointer',
-                  padding: '0',
-                  font: 'inherit',
-                  textDecoration: 'underline',
-                }}
-              >
-                Sign up
-              </button>
-            </span>
+            <>
+              <div>
+                <button
+                  type="button"
+                  onClick={handleResetPassword}
+                  style={linkButtonStyles}
+                >
+                  Forgot your password?
+                </button>
+              </div>
+              <div>
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(false)}
+                  style={linkButtonStyles}
+                >
+                  Sign up
+                </button>
+              </div>
+            </>
           ) : (
             <span>
               Already have an account?{' '}
               <button
                 type="button"
                 onClick={() => setIsLogin(true)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#007bff',
-                  cursor: 'pointer',
-                  padding: '0',
-                  font: 'inherit',
-                  textDecoration: 'underline',
-                }}
+                style={linkButtonStyles}
               >
                 Login
               </button>
