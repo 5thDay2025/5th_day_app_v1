@@ -25,30 +25,28 @@ function App() {
       setError(null);
 
       // First check if we have a session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        console.error('Session check error:', sessionError);
-      }
-      console.log('Current session:', session);
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('Current session before signout:', session);
 
-      // Try to sign out
-      const { error } = await supabase.auth.signOut({
-        scope: 'local' // Try local signout first instead of global
-      });
-      
-      if (error) {
-        console.error('Sign out error:', error);
-        throw error;
+      try {
+        // Try local sign out first
+        await supabase.auth.signOut({ scope: 'local' });
+      } catch (signOutError) {
+        console.error('Initial sign out attempt failed:', signOutError);
       }
 
-      // Clear any local storage
+      // Clear any local storage and session storage
       localStorage.clear();
+      sessionStorage.clear();
       
-      // Force reload the page to clear any cached state
-      window.location.href = import.meta.env.BASE_URL;
+      // Redirect to base URL
+      const baseUrl = import.meta.env.BASE_URL || '/5th_day_app_v1/';
+      console.log('Redirecting to:', baseUrl);
+      window.location.href = baseUrl;
+      
     } catch (err) {
       console.error('Sign out process error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to sign out');
+      setError('Unable to sign out properly. Please try refreshing the page.');
     } finally {
       setSigningOut(false);
     }
