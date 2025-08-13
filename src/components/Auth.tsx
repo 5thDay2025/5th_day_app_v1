@@ -35,7 +35,14 @@ export const Auth: React.FC = () => {
             emailRedirectTo: fullRedirectUrl
           }
         });
+        
         if (error) throw error;
+
+        // Check if the user already exists
+        if (data?.user?.identities?.length === 0) {
+          setError('This email is already registered. Please try logging in instead.');
+          return;
+        }
 
         if (data) {
           setShowConfirmation(true);
