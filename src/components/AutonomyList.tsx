@@ -1,110 +1,129 @@
 import React from 'react';
 import { supabase } from '../lib/supabase';
-import type { Autonomy } from '../types/database.types';
+import type { Autonomy, User } from '../types/database.types';
+import { useStudentAutonomy } from '../hooks/useSupabase';
 
-export const AutonomyList: React.FC = () => {
+interface Props {
+  currentUser: User | null;
+}
+
+export const AutonomyList: React.FC<Props> = ({ currentUser }) => {
   console.log('AutonomyList component rendering');
 
   const [autonomies, setAutonomies] = React.useState<Autonomy[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  
+  // Fetch student's autonomy if they are a student
+  const { studentAutonomy, loading: studentAutonomyLoading } = useStudentAutonomy(
+    currentUser?.role_id === 3 ? currentUser.id : undefined
+  );
 
   React.useEffect(() => {
-    const fetchAutonomies = async () => {
-      try {
-        console.log('Starting to fetch autonomies...');
+    // Only fetch all autonomies if user is not a student
+    if (currentUser?.role_id !== 3) {
+      const fetchAutonomies = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('autonomy')
+            .select('id, created_at, updated_at, name, description');
 
-        const { data, error } = await supabase
-          .from('autonomy')
-          .select('id, created_at, updated_at, name, description');
+          if (error) throw error;
 
-        console.log('Raw response:', { data, error });
+          if (!data) {
+            setAutonomies([]);
+            return;
+          }
 
-        if (error) {
-          console.error('Supabase error:', error);
-          throw error;
+          const validatedData = data.map(item => ({
+            id: String(item.id),
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            name: item.name,
+            description: item.description
+          }));
+
+          setAutonomies(validatedData);
+        } catch (err) {
+          console.error('Error fetching autonomies:', err);
+          setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+          setLoading(false);
         }
+      };
 
-        if (!data) {
-          console.log('No data returned');
-          setAutonomies([]);
-          return;
-        }
+      fetchAutonomies();
+    }
+  }, [currentUser?.role_id]);
 
-        console.log('Fetched autonomies:', data);
-        console.log('First autonomy:', data[0]);
-        
-        // Validate the data matches our interface
-        const validatedData = data.map(item => ({
-          id: String(item.id),
-          created_at: item.created_at,
-          updated_at: item.updated_at,
-          name: item.name,
-          description: item.description
-        }));
-
-        setAutonomies(validatedData);
-      } catch (err) {
-        console.error('Error fetching autonomies:', err);
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAutonomies();
-  }, []);
+  const isStudent = currentUser?.role_id === 3;
+  const isLoading = isStudent ? studentAutonomyLoading : loading;
 
   return (
     <div style={{ padding: '1rem' }}>
-
-      {loading ? (
-        <div style={{ padding: '1rem', border: '1px solid #ccc', margin: '1rem' }}>
-          <h3>Loading autonomies...</h3>
-          <p>Checking Supabase connection...</p>
+      {isLoading ? (
+        <div style={{ padding: '1rem', margin: '1rem' }}>
+          <h3>Loading...</h3>
         </div>
       ) : error ? (
-        <div style={{ padding: '1rem', border: '1px solid red', margin: '1rem' }}>
-          <h3>Error Loading Autonomies</h3>
-          <p>Error: {error}</p>
-          <div>
-            <h4>Troubleshooting:</h4>
-            <ul>
-              <li>Check if the table exists in the public schema</li>
-              <li>Verify RLS policies are configured correctly</li>
-              <li>Click the test button above to see available tables</li>
-            </ul>
-          </div>
+        <div style={{ padding: '1rem', color: '#dc3545', margin: '1rem' }}>
+          <h3>Error Loading Data</h3>
+          <p>{error}</p>
         </div>
-      ) : autonomies.length === 0 ? (
-        <div style={{ padding: '1rem', border: '1px solid orange', margin: '1rem' }}>
-          <h3>No Autonomies Found</h3>
-          <p>The query completed successfully but no records were returned.</p>
-          <div>
-            <h4>Debug Information:</h4>
-            <ul>
-              <li>Loading state: {loading ? 'Yes' : 'No'}</li>
-              <li>Error state: {error ? error : 'None'}</li>
-              <li>Records found: {autonomies.length}</li>
-            </ul>
-          </div>
+      ) : isStudent ? (
+        <div>
+          {studentAutonomy?.autonomy ? (
+            <div style={{ 
+              maxWidth: '800px',
+              margin: '0 auto',
+              padding: '2rem',
+              backgroundColor: '#2a2a2a',
+              borderRadius: '8px'
+            }}>
+              <h2 style={{ 
+                color: '#fff',
+                marginBottom: '1.5rem',
+                fontSize: '1.75rem'
+              }}>
+                Current Autonomy Level
+              </h2>
+              <h3 style={{ 
+                color: '#fff',
+                marginBottom: '1rem',
+                fontSize: '1.5rem'
+              }}>
+                {studentAutonomy.autonomy.name}
+              </h3>
+              <p style={{ 
+                color: '#ccc',
+                lineHeight: '1.8',
+                fontSize: '1.1rem',
+                textAlign: 'left'
+              }}>
+                {studentAutonomy.autonomy.description}
+              </p>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', color: '#666' }}>
+              <p>No autonomy level has been assigned yet.</p>
+            </div>
+          )}
         </div>
       ) : (
         <div>
-          <h2>Autonomies Found: {autonomies.length}</h2>
+          <h2>All Autonomy Levels</h2>
           <div style={{ display: 'grid', gap: '1rem', padding: '1rem' }}>
             {autonomies.map(autonomy => (
               <div 
                 key={autonomy.id}
                 style={{
-                  border: '1px solid #ccc',
-                  padding: '1rem',
-                  borderRadius: '4px'
+                  backgroundColor: '#2a2a2a',
+                  padding: '1.5rem',
+                  borderRadius: '6px'
                 }}
               >
-                <h3>{autonomy.name}</h3>
-                <p>{autonomy.description}</p>
-                <small>Created: {new Date(autonomy.created_at).toLocaleDateString()}</small>
+                <h3 style={{ color: '#fff' }}>Level {autonomy.id}: {autonomy.name}</h3>
+                <p style={{ color: '#ccc' }}>{autonomy.description}</p>
               </div>
             ))}
           </div>

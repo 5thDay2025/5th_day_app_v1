@@ -4,9 +4,11 @@ import { ResetPassword } from './components/ResetPassword';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import { useEffect, useState } from 'react';
+import { useCurrentUser } from './hooks/useSupabase';
 
 function App() {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { currentUser, loading: userLoading } = useCurrentUser(user?.email);
   const [isResetPassword, setIsResetPassword] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +54,7 @@ function App() {
     }
   };
 
-  if (loading) {
+  if (authLoading || userLoading) {
     return <div>Loading...</div>;
   }
 
@@ -66,8 +68,26 @@ function App() {
 
   return (
     <div>
-      <h1>5th Day App</h1>
-      <div style={{ position: 'relative' }}>
+      <div style={{
+        backgroundColor: '#242424',
+        padding: '1rem',
+        marginBottom: '2rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div>
+          <h1 style={{ margin: 0, color: '#fff' }}>5th Day App</h1>
+          {currentUser && (
+            <p style={{ 
+              margin: '0.5rem 0 0 0',
+              color: '#aaa',
+              fontSize: '1rem'
+            }}>
+              Welcome, {currentUser.first_name} {currentUser.last_name}
+            </p>
+          )}
+        </div>
         <button 
           onClick={handleSignOut}
           disabled={signingOut}
@@ -78,30 +98,27 @@ function App() {
             border: 'none',
             borderRadius: '4px',
             cursor: signingOut ? 'not-allowed' : 'pointer',
-            marginBottom: '20px',
             opacity: signingOut ? 0.7 : 1,
           }}
         >
           {signingOut ? 'Signing Out...' : 'Sign Out'}
         </button>
-        {error && (
-          <div style={{ 
-            color: 'red', 
-            marginTop: '8px',
-            fontSize: '14px'
-          }}>
-            {error}
-          </div>
-        )}
       </div>
 
-      <div>
-        <h2>Debug Info:</h2>
-        <p>React is running: ✅</p>
-        <p>Testing Supabase connection below:</p>
-      </div>
+      {error && (
+        <div style={{ 
+          color: '#dc3545', 
+          padding: '1rem',
+          marginBottom: '1rem',
+          backgroundColor: '#f8d7da',
+          borderRadius: '4px',
+          fontSize: '14px'
+        }}>
+          {error}
+        </div>
+      )}
       
-      <AutonomyList />
+      <AutonomyList currentUser={currentUser} />
     </div>
   );
 }
