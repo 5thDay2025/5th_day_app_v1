@@ -16,14 +16,29 @@ export const Auth: React.FC = () => {
     setError(null);
 
     try {
-      const { data, error } = isLogin 
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
+      if (isLogin) {
+        const { data, error } = await supabase.auth.signInWithPassword({ 
+          email, 
+          password 
+        });
+        if (error) throw error;
+      } else {
+        // Get the base URL from Vite's environment for signup
+        const baseUrl = import.meta.env.BASE_URL;
+        const fullRedirectUrl = `${window.location.origin}${baseUrl}`;
 
-      if (error) throw error;
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: fullRedirectUrl
+          }
+        });
+        if (error) throw error;
 
-      if (data && !isLogin) {
-        alert('Check your email for the confirmation link!');
+        if (data) {
+          alert('Check your email for the confirmation link!');
+        }
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
@@ -43,12 +58,12 @@ export const Auth: React.FC = () => {
     setError(null);
     
     try {
-      // Add a specific hash format that Supabase expects
-      const redirectUrl = new URL(`${window.location.origin}${window.location.pathname}`);
-      redirectUrl.hash = 'type=recovery';
+      // Get the base URL from Vite's environment
+      const baseUrl = import.meta.env.BASE_URL;
+      const fullRedirectUrl = `${window.location.origin}${baseUrl}`;
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl.toString()
+        redirectTo: fullRedirectUrl
       });
       
       if (error) throw error;

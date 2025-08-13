@@ -97,7 +97,8 @@ export const ResetPassword: React.FC = () => {
 
       // After 3 seconds, redirect to login
       setTimeout(() => {
-        window.location.href = '/5th_day_app_v1/';
+        const baseUrl = import.meta.env.BASE_URL;
+        window.location.href = baseUrl;
       }, 3000);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred';
