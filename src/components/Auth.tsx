@@ -9,6 +9,7 @@ export const Auth: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [resetSent, setResetSent] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +38,7 @@ export const Auth: React.FC = () => {
         if (error) throw error;
 
         if (data) {
-          alert('Check your email for the confirmation link!');
+          setShowConfirmation(true);
         }
       }
     } catch (error) {
@@ -105,6 +106,31 @@ export const Auth: React.FC = () => {
     textDecoration: 'underline',
   };
 
+  if (showConfirmation) {
+    return (
+      <div className="auth-container" style={{
+        maxWidth: '400px',
+        margin: '40px auto',
+        padding: '20px',
+        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+        borderRadius: '8px',
+        textAlign: 'center',
+      }}>
+        <h2>Confirm your signup</h2>
+        <p>Check your email for a confirmation link from Supabase Auth</p>
+        <button
+          onClick={() => {
+            setShowConfirmation(false);
+            setIsLogin(true);
+          }}
+          style={linkButtonStyles}
+        >
+          Back to login
+        </button>
+      </div>
+    );
+  }
+
   if (resetSent) {
     return (
       <div className="auth-container" style={{
@@ -115,8 +141,8 @@ export const Auth: React.FC = () => {
         borderRadius: '8px',
         textAlign: 'center',
       }}>
-        <h2>Check Your Email</h2>
-        <p>We've sent you a password reset link. Please check your email.</p>
+        <h2>Reset your password</h2>
+        <p>Check your email for a password reset link from Supabase Auth</p>
         <button
           onClick={() => {
             setResetSent(false);
@@ -224,7 +250,10 @@ export const Auth: React.FC = () => {
                 Don't have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => setIsLogin(false)}
+                  onClick={() => {
+                    setIsLogin(false);
+                    setError(null);  // Clear error when switching to signup
+                  }}
                   style={linkButtonStyles}
                 >
                   Sign up
@@ -236,7 +265,10 @@ export const Auth: React.FC = () => {
               Already have an account?{' '}
               <button
                 type="button"
-                onClick={() => setIsLogin(true)}
+                onClick={() => {
+                  setIsLogin(true);
+                  setError(null);  // Clear error when switching to login
+                }}
                 style={linkButtonStyles}
               >
                 Login
