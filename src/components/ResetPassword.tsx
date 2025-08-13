@@ -11,8 +11,12 @@ export const ResetPassword: React.FC = () => {
   useEffect(() => {
     const setupSession = async () => {
       try {
-        const hashString = window.location.hash.substring(1);
-        const params = new URLSearchParams(hashString);
+        // Handle double hash format by taking everything after the first #
+        const fullHash = window.location.hash.substring(1);
+        // Split by # and take the last part which contains the tokens
+        const hashParts = fullHash.split('#');
+        const lastPart = hashParts[hashParts.length - 1];
+        const params = new URLSearchParams(lastPart);
         
         // Get tokens
         const accessToken = params.get('access_token');
