@@ -7,42 +7,19 @@ export const ResetPassword: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<string[]>([]);
-
-  const addDebugInfo = (info: string) => {
-    setDebugInfo(prev => [...prev, info]);
-  };
 
   useEffect(() => {
     const setupSession = async () => {
       try {
-        // Log the full URL for debugging
-        const fullUrl = window.location.href;
-        addDebugInfo(`Full URL: ${fullUrl}`);
-
-        // Parse the hash parameters
-        const hash = window.location.hash.substring(1); // Remove first #
-        addDebugInfo(`Hash: ${hash}`);
-
-        // Split by # to handle double hash
-        const hashParts = hash.split('#');
-        const lastPart = hashParts[hashParts.length - 1];
-        addDebugInfo(`Processing hash part: ${lastPart.substring(0, 50)}...`);
-
-        // Parse the parameters
-        const params = new URLSearchParams(lastPart);
+        const hashString = window.location.hash.substring(1);
+        const params = new URLSearchParams(hashString);
         
         // Get tokens
         const accessToken = params.get('access_token');
         const refreshToken = params.get('refresh_token');
-        const type = params.get('type');
 
-        addDebugInfo(`Access token present: ${!!accessToken}`);
-        addDebugInfo(`Refresh token present: ${!!refreshToken}`);
-        addDebugInfo(`Type: ${type}`);
-
-        if (!accessToken || !refreshToken || type !== 'recovery') {
-          throw new Error('Missing or invalid tokens');
+        if (!accessToken || !refreshToken) {
+          throw new Error('Please use the reset link from your email');
         }
 
         // Set the session
@@ -55,14 +32,8 @@ export const ResetPassword: React.FC = () => {
           throw sessionError;
         }
 
-        // Verify the session was set
-        const { data: sessionData } = await supabase.auth.getSession();
-        addDebugInfo(`Session established: ${!!sessionData.session}`);
-
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        addDebugInfo(`Error: ${errorMessage}`);
-        setError(`Setup error: ${errorMessage}`);
+        setError('Please use the reset link from your email');
       }
     };
 
@@ -80,19 +51,12 @@ export const ResetPassword: React.FC = () => {
     setError(null);
 
     try {
-      addDebugInfo('Attempting to update password...');
-      
-      // First check if we have a session
-      const { data: sessionData } = await supabase.auth.getSession();
-      addDebugInfo(`Session before update: ${!!sessionData.session}`);
-
       const { error } = await supabase.auth.updateUser({
         password: password
       });
 
       if (error) throw error;
       
-      addDebugInfo('Password updated successfully');
       setSuccess(true);
 
       // After 3 seconds, redirect to login
@@ -101,9 +65,7 @@ export const ResetPassword: React.FC = () => {
         window.location.href = baseUrl;
       }, 3000);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-      addDebugInfo(`Password update error: ${errorMessage}`);
-      setError(errorMessage);
+      setError('Unable to update password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -138,9 +100,8 @@ export const ResetPassword: React.FC = () => {
         borderRadius: '8px',
         textAlign: 'center',
       }}>
-        <h2>Password Updated!</h2>
-        <p>Your password has been successfully reset.</p>
-        <p>Redirecting to login page in 3 seconds...</p>
+        <h2>Password successfully updated!</h2>
+        <p>Redirecting to your student page</p>
       </div>
     );
   }
@@ -210,31 +171,6 @@ export const ResetPassword: React.FC = () => {
         >
           {loading ? 'Updating Password...' : 'Update Password'}
         </button>
-
-        {/* Debug Information */}
-        <div style={{
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '4px',
-          fontSize: '14px',
-          border: '1px solid #dee2e6',
-          color: '#000',
-        }}>
-          <h3 style={{ margin: '0 0 12px 0', color: '#000' }}>Debug Info:</h3>
-          {debugInfo.map((info, index) => (
-            <div 
-              key={index} 
-              style={{ 
-                marginBottom: '8px',
-                padding: '4px 0',
-                borderBottom: index < debugInfo.length - 1 ? '1px solid #dee2e6' : 'none'
-              }}
-            >
-              {info}
-            </div>
-          ))}
-        </div>
       </form>
     </div>
   );
