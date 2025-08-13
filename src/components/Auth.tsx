@@ -116,7 +116,7 @@ export const Auth: React.FC = () => {
         borderRadius: '8px',
         textAlign: 'center',
       }}>
-        <h2>Confirm your signup</h2>
+        <h2>Confirm Your Signup</h2>
         <p>Check your email for a confirmation link from Supabase Auth</p>
         <button
           onClick={() => {
@@ -141,7 +141,7 @@ export const Auth: React.FC = () => {
         borderRadius: '8px',
         textAlign: 'center',
       }}>
-        <h2>Reset your password</h2>
+        <h2>Reset Your Password</h2>
         <p>Check your email for a password reset link from Supabase Auth</p>
         <button
           onClick={() => {

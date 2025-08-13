@@ -98,7 +98,7 @@ export const ResetPassword: React.FC = () => {
         borderRadius: '8px',
         textAlign: 'center',
       }}>
-        <h2>Password successfully updated!</h2>
+        <h2>Password successfully updated</h2>
         <p>Redirecting to your student page</p>
       </div>
     );
@@ -112,7 +112,7 @@ export const ResetPassword: React.FC = () => {
       boxShadow: '0 0 10px rgba(0,0,0,0.1)',
       borderRadius: '8px',
     }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>Reset your password</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>Reset Your Password</h1>
       
       <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div>
