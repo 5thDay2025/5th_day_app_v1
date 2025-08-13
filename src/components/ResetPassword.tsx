@@ -20,34 +20,44 @@ export const ResetPassword: React.FC = () => {
         const fullUrl = window.location.href;
         addDebugInfo(`Full URL: ${fullUrl}`);
 
-        // Check if we're on a recovery page
-        if (!fullUrl.includes('type=recovery')) {
-          throw new Error('Not a recovery page');
-        }
+        // Parse the hash parameters
+        const hash = window.location.hash.substring(1); // Remove first #
+        addDebugInfo(`Hash: ${hash}`);
 
-        // Get the tokens from the URL
-        const hashParams = new URLSearchParams(window.location.hash.replace('#', ''));
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
+        // Split by # to handle double hash
+        const hashParts = hash.split('#');
+        const lastPart = hashParts[hashParts.length - 1];
+        addDebugInfo(`Processing hash part: ${lastPart.substring(0, 50)}...`);
 
-        addDebugInfo(`Access token found: ${!!accessToken}`);
-        addDebugInfo(`Refresh token found: ${!!refreshToken}`);
+        // Parse the parameters
+        const params = new URLSearchParams(lastPart);
+        
+        // Get tokens
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        const type = params.get('type');
 
-        if (!accessToken) {
-          throw new Error('No access token found');
+        addDebugInfo(`Access token present: ${!!accessToken}`);
+        addDebugInfo(`Refresh token present: ${!!refreshToken}`);
+        addDebugInfo(`Type: ${type}`);
+
+        if (!accessToken || !refreshToken || type !== 'recovery') {
+          throw new Error('Missing or invalid tokens');
         }
 
         // Set the session
         const { error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
-          refresh_token: refreshToken || ''
+          refresh_token: refreshToken
         });
 
         if (sessionError) {
           throw sessionError;
         }
 
-        addDebugInfo('Session setup successful');
+        // Verify the session was set
+        const { data: sessionData } = await supabase.auth.getSession();
+        addDebugInfo(`Session established: ${!!sessionData.session}`);
 
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -71,6 +81,11 @@ export const ResetPassword: React.FC = () => {
 
     try {
       addDebugInfo('Attempting to update password...');
+      
+      // First check if we have a session
+      const { data: sessionData } = await supabase.auth.getSession();
+      addDebugInfo(`Session before update: ${!!sessionData.session}`);
+
       const { error } = await supabase.auth.updateUser({
         password: password
       });
@@ -82,7 +97,7 @@ export const ResetPassword: React.FC = () => {
 
       // After 3 seconds, redirect to login
       setTimeout(() => {
-        window.location.href = '/5th_day_app_v1';
+        window.location.href = '/5th_day_app_v1/';
       }, 3000);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred';

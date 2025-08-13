@@ -43,7 +43,13 @@ export const Auth: React.FC = () => {
     setError(null);
     
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      // Add a specific hash format that Supabase expects
+      const redirectUrl = new URL(`${window.location.origin}${window.location.pathname}`);
+      redirectUrl.hash = 'type=recovery';
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl.toString()
+      });
       
       if (error) throw error;
       
