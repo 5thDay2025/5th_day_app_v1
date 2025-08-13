@@ -11,33 +11,27 @@ export const ResetPassword: React.FC = () => {
   useEffect(() => {
     const setupSession = async () => {
       try {
-        // Handle double hash format by taking everything after the first #
-        const fullHash = window.location.hash.substring(1);
-        // Split by # and take the last part which contains the tokens
-        const hashParts = fullHash.split('#');
-        const lastPart = hashParts[hashParts.length - 1];
-        const params = new URLSearchParams(lastPart);
-        
-        // Get tokens
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
+        // Get token from URL query parameters
+        const searchParams = new URLSearchParams(window.location.search);
+        const token = searchParams.get('token');
+        const type = searchParams.get('type');
 
-        if (!accessToken || !refreshToken) {
-          throw new Error('Please use the reset link from your email');
+        if (!token || type !== 'recovery') {
+          return; // Not a recovery page, no need to show error
         }
 
-        // Set the session
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken
+        // Verify the token
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'recovery'
         });
 
-        if (sessionError) {
-          throw sessionError;
+        if (error) {
+          throw error;
         }
 
       } catch (error) {
-        setError('Please use the reset link from your email');
+        setError('Unable to verify reset link. Please try again.');
       }
     };
 
@@ -118,7 +112,7 @@ export const ResetPassword: React.FC = () => {
       boxShadow: '0 0 10px rgba(0,0,0,0.1)',
       borderRadius: '8px',
     }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>Reset Your Password</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>Reset your password</h1>
       
       <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div>
