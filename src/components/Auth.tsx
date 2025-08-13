@@ -17,7 +17,7 @@ export const Auth: React.FC = () => {
 
     try {
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({ 
+        const { error } = await supabase.auth.signInWithPassword({ 
           email, 
           password 
         });
