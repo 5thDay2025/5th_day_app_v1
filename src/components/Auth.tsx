@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import './Auth.css';
 
 export const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -84,45 +85,10 @@ export const Auth: React.FC = () => {
     }
   };
 
-  const inputStyles = {
-    width: '100%',
-    padding: '10px',
-    borderRadius: '4px',
-    border: '1px solid #ddd',
-    fontSize: '16px',
-    boxSizing: 'border-box' as const,
-  };
-
-  const buttonStyles = {
-    padding: '10px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: loading ? 'not-allowed' : 'pointer',
-    opacity: loading ? 0.7 : 1,
-  };
-
-  const linkButtonStyles = {
-    background: 'none',
-    border: 'none',
-    color: '#007bff',
-    cursor: 'pointer',
-    padding: '0',
-    font: 'inherit',
-    textDecoration: 'underline',
-  };
 
   if (showConfirmation) {
     return (
-      <div className="auth-container" style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        padding: '20px',
-        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-        borderRadius: '8px',
-        textAlign: 'center',
-      }}>
+      <div className="auth-container text-center">
         <h2>Confirm Your Signup</h2>
         <p>Check your email for a confirmation link from Supabase Auth</p>
         <button
@@ -130,7 +96,7 @@ export const Auth: React.FC = () => {
             setShowConfirmation(false);
             setIsLogin(true);
           }}
-          style={linkButtonStyles}
+          className="auth-link"
         >
           Back to login
         </button>
@@ -140,14 +106,7 @@ export const Auth: React.FC = () => {
 
   if (resetSent) {
     return (
-      <div className="auth-container" style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        padding: '20px',
-        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-        borderRadius: '8px',
-        textAlign: 'center',
-      }}>
+      <div className="auth-container text-center">
         <h2>Reset Your Password</h2>
         <p>Check your email for a password reset link from Supabase Auth</p>
         <button
@@ -155,7 +114,7 @@ export const Auth: React.FC = () => {
             setResetSent(false);
             setError(null);
           }}
-          style={linkButtonStyles}
+          className="auth-link"
         >
           Back to login
         </button>
@@ -164,91 +123,64 @@ export const Auth: React.FC = () => {
   }
 
   return (
-    <div className="auth-container" style={{
-      maxWidth: '400px',
-      margin: '40px auto',
-      padding: '20px',
-      boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-      borderRadius: '8px',
-    }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>Welcome to 5th Day App</h1>
+    <div className="auth-container">
+      <h1 className="auth-title">5th Day Dashboard</h1>
       
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div>
-          <label htmlFor="email" style={{ display: 'block', marginBottom: '8px' }}>Email</label>
+      <form onSubmit={handleSubmit} className="auth-form">
+        <div className="form-group">
+          <label htmlFor="email" className="form-label">Email</label>
           <input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={inputStyles}
+            className="form-input"
           />
         </div>
-        <div>
-          <label htmlFor="password" style={{ display: 'block', marginBottom: '8px' }}>Password</label>
-          <div style={{ position: 'relative' }}>
+        <div className="form-group">
+          <label htmlFor="password" className="form-label">Password</label>
+          <div className="form-group">
             <input
               id="password"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={{
-                ...inputStyles,
-                paddingRight: '40px',
-              }}
+              className="form-input with-button"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                color: '#666',
-                fontSize: '18px',
-              }}
+              className="password-toggle"
             >
               {showPassword ? '⊖' : '⊕'}
             </button>
           </div>
         </div>
         {error && (
-          <div style={{ color: 'red', textAlign: 'center' }}>
+          <div className="error-message">
             {error}
           </div>
         )}
         <button
           type="submit"
           disabled={loading}
-          style={buttonStyles}
+          className="auth-button"
         >
           {loading 
             ? (isLogin ? 'Logging in...' : 'Creating account...') 
             : (isLogin ? 'Login' : 'Sign Up')}
         </button>
 
-        <div style={{ 
-          textAlign: 'center',
-          marginTop: '8px',
-          color: '#666',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-        }}>
+        <div className="auth-links">
           {isLogin ? (
             <>
               <div>
                 <button
                   type="button"
                   onClick={handleResetPassword}
-                  style={linkButtonStyles}
+                  className="auth-link"
                 >
                   Forgot your password?
                 </button>
@@ -261,7 +193,7 @@ export const Auth: React.FC = () => {
                     setIsLogin(false);
                     setError(null);  // Clear error when switching to signup
                   }}
-                  style={linkButtonStyles}
+                  className="auth-link"
                 >
                   Sign up
                 </button>
@@ -276,7 +208,7 @@ export const Auth: React.FC = () => {
                   setIsLogin(true);
                   setError(null);  // Clear error when switching to login
                 }}
-                style={linkButtonStyles}
+                className="auth-link"
               >
                 Login
               </button>

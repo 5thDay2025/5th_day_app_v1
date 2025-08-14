@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import './ResetPassword.css';
 
 export const ResetPassword: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -7,7 +8,7 @@ export const ResetPassword: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
+  
   useEffect(() => {
     const setupSession = async () => {
       try {
@@ -69,35 +70,10 @@ export const ResetPassword: React.FC = () => {
     }
   };
 
-  const inputStyles = {
-    width: '100%',
-    padding: '10px',
-    borderRadius: '4px',
-    border: '1px solid #ddd',
-    fontSize: '16px',
-    boxSizing: 'border-box' as const,
-  };
-
-  const buttonStyles = {
-    padding: '10px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: loading ? 'not-allowed' : 'pointer',
-    opacity: loading ? 0.7 : 1,
-  };
 
   if (success) {
     return (
-      <div style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        padding: '20px',
-        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-        borderRadius: '8px',
-        textAlign: 'center',
-      }}>
+      <div className="reset-container text-center">
         <h2>Password successfully updated</h2>
         <p>Redirecting to your student page</p>
       </div>
@@ -105,19 +81,13 @@ export const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div style={{
-      maxWidth: '400px',
-      margin: '40px auto',
-      padding: '20px',
-      boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-      borderRadius: '8px',
-    }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>Reset Your Password</h1>
+    <div className="reset-container">
+      <h1 className="reset-title">Reset Your Password</h1>
       
-      <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div>
-          <label htmlFor="password" style={{ display: 'block', marginBottom: '8px' }}>New Password</label>
-          <div style={{ position: 'relative' }}>
+      <form onSubmit={handleReset} className="reset-form">
+        <div className="form-group">
+          <label htmlFor="password" className="form-label">New Password</label>
+          <div className="form-group">
             <input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -125,47 +95,29 @@ export const ResetPassword: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              style={{
-                ...inputStyles,
-                paddingRight: '40px',
-              }}
+              className="form-input with-button"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                color: '#666',
-                fontSize: '18px',
-              }}
+              className="password-toggle"
             >
               {showPassword ? '⊖' : '⊕'}
             </button>
           </div>
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#666', 
-            marginTop: '4px' 
-          }}>
+          <div className="password-hint">
             Password must be at least 6 characters long
           </div>
         </div>
         {error && (
-          <div style={{ color: 'red', textAlign: 'center' }}>
+          <div className="error-message">
             {error}
           </div>
         )}
         <button
           type="submit"
           disabled={loading}
-          style={buttonStyles}
+          className="reset-button"
         >
           {loading ? 'Updating Password...' : 'Update Password'}
         </button>

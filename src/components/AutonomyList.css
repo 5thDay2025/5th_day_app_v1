@@ -1,0 +1,83 @@
+.autonomy-container {
+  padding: 1rem;
+}
+
+.loading-container {
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.error-container {
+  padding: 1rem;
+  color: #dc3545;
+  margin: 1rem;
+}
+
+.student-autonomy {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.autonomy-title {
+  color: #0077BE;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+.autonomy-subtitle {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.autonomy-description {
+  color: #666;
+  line-height: 1.8;
+  font-size: 1.1rem;
+  text-align: left;
+}
+
+.autonomy-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.autonomy-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.autonomy-card-title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #0077BE;
+  font-weight: bold;
+}
+
+.autonomy-card-description {
+  color: #666;
+  line-height: 1.6;
+}
+
+.empty-message {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

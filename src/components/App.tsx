@@ -1,10 +1,12 @@
-import { AutonomyList } from './components/AutonomyList';
-import { Auth } from './components/Auth';
-import { ResetPassword } from './components/ResetPassword';
-import { useAuth } from './contexts/AuthContext';
-import { supabase } from './lib/supabase';
+import { AutonomyList } from './AutonomyList';
+import { Auth } from './Auth';
+import { ResetPassword } from './ResetPassword';
+import { StudentGrowthChart } from './StudentGrowthChart';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { useEffect, useState } from 'react';
-import { useCurrentUser } from './hooks/useSupabase';
+import { useCurrentUser } from '../hooks/useSupabase';
+import './App.css';
 
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -27,8 +29,7 @@ function App() {
       setError(null);
 
       // First check if we have a session
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('Current session before signout:', session);
+      await supabase.auth.getSession();
 
       try {
         // Try local sign out first
@@ -43,7 +44,6 @@ function App() {
       
       // Redirect to base URL
       const baseUrl = import.meta.env.BASE_URL || '/5th_day_app_v1/';
-      console.log('Redirecting to:', baseUrl);
       window.location.href = baseUrl;
       
     } catch (err) {
@@ -67,29 +67,12 @@ function App() {
   }
 
   return (
-    <div style={{ paddingTop: '6rem' }}>
-      <div style={{
-        backgroundColor: '#242424',
-        padding: '1rem',
-        marginBottom: '2rem',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingLeft: '2rem',
-        paddingRight: '2rem'
-      }}>
+    <div className="app-container">
+      <div className="header">
         <div>
-          <h1 style={{ margin: 0, color: '#fff' }}>5th Day App</h1>
+          <h1 className="app-title">5th Day Dashboard</h1>
           {currentUser && (
-            <p style={{ 
-              margin: '0.5rem 0 0 0',
-              color: '#aaa',
-              fontSize: '1rem'
-            }}>
+            <p className="welcome-text">
               Welcome, {currentUser.first_name} {currentUser.last_name}!
             </p>
           )}
@@ -97,36 +80,22 @@ function App() {
         <button 
           onClick={handleSignOut}
           disabled={signingOut}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: signingOut ? 'not-allowed' : 'pointer',
-            opacity: signingOut ? 0.7 : 1,
-          }}
+          className="sign-out-button"
         >
           {signingOut ? 'Signing Out...' : 'Sign Out'}
         </button>
       </div>
 
       {error && (
-        <div style={{ 
-          color: '#dc3545', 
-          padding: '1rem',
-          marginBottom: '1rem',
-          backgroundColor: '#f8d7da',
-          borderRadius: '4px',
-          fontSize: '14px'
-        }}>
+        <div className="error-message">
           {error}
         </div>
       )}
       
+      {currentUser?.role_id === 3 && <StudentGrowthChart />}
       <AutonomyList currentUser={currentUser} />
     </div>
   );
 }
 
-export default App; 
+export default App;

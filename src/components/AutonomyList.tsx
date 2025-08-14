@@ -2,6 +2,7 @@ import React from 'react';
 import { supabase } from '../lib/supabase';
 import type { Autonomy, User } from '../types/database.types';
 import { useStudentAutonomy } from '../hooks/useSupabase';
+import './AutonomyList.css';
 
 interface Props {
   currentUser: User | null;
@@ -60,87 +61,44 @@ export const AutonomyList: React.FC<Props> = ({ currentUser }) => {
   const isLoading = isStudent ? studentAutonomyLoading : loading;
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className="autonomy-container">
       {isLoading ? (
-        <div style={{ padding: '1rem', margin: '1rem' }}>
+        <div className="loading-container">
           <h3>Loading...</h3>
         </div>
       ) : error ? (
-        <div style={{ padding: '1rem', color: '#dc3545', margin: '1rem' }}>
+        <div className="error-container">
           <h3>Error Loading Data</h3>
           <p>{error}</p>
         </div>
       ) : isStudent ? (
         <div>
           {studentAutonomy?.autonomy ? (
-            <div style={{ 
-              maxWidth: '800px',
-              margin: '0 auto',
-              padding: '2rem',
-              backgroundColor: '#2a2a2a',
-              borderRadius: '8px'
-            }}>
-              <h2 style={{ 
-                color: '#fff',
-                marginBottom: '1.5rem',
-                fontSize: '1.75rem'
-              }}>
+            <div className="student-autonomy">
+              <h2 className="autonomy-title">
                 Current Autonomy Level
               </h2>
-              <h3 style={{ 
-                color: '#fff',
-                marginBottom: '1rem',
-                fontSize: '1.5rem'
-              }}>
+              <h3 className="autonomy-subtitle">
                 {studentAutonomy.autonomy.name}
               </h3>
-              <p style={{ 
-                color: '#ccc',
-                lineHeight: '1.8',
-                fontSize: '1.1rem',
-                textAlign: 'left'
-              }}>
+              <p className="autonomy-description">
                 {studentAutonomy.autonomy.description}
               </p>
             </div>
           ) : (
-            <div style={{ 
-              maxWidth: '800px',
-              margin: '0 auto',
-              padding: '2rem',
-              backgroundColor: '#2a2a2a',
-              borderRadius: '8px',
-              textAlign: 'center'
-            }}>
-              <h2 style={{ 
-                color: '#fff',
-                marginBottom: '1.5rem',
-                fontSize: '1.75rem'
-              }}>
+            <div className="student-autonomy text-center">
+              <h2 className="autonomy-title">
                 Current Autonomy Level
               </h2>
-              <p style={{ 
-                color: '#ccc',
-                fontSize: '1.1rem',
-                margin: 0
-              }}>
+              <p className="autonomy-description">
                 No autonomy level has been assigned yet. Please check with your teacher.
               </p>
             </div>
           )}
         </div>
       ) : (
-        <div style={{ 
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '2rem',
-          textAlign: 'center'
-        }}>
-          <p style={{ 
-            color: '#ccc',
-            fontSize: '1.1rem',
-            margin: 0
-          }}>
+        <div className="empty-message text-center">
+          <p className="autonomy-description">
             Nothing to see here.
           </p>
         </div>
