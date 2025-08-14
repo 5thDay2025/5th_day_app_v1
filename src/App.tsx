@@ -67,14 +67,20 @@ function App() {
   }
 
   return (
-    <div>
+    <div style={{ paddingTop: '6rem' }}>
       <div style={{
         backgroundColor: '#242424',
         padding: '1rem',
         marginBottom: '2rem',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        paddingLeft: '2rem',
+        paddingRight: '2rem'
       }}>
         <div>
           <h1 style={{ margin: 0, color: '#fff' }}>5th Day App</h1>
@@ -84,7 +90,7 @@ function App() {
               color: '#aaa',
               fontSize: '1rem'
             }}>
-              Welcome, {currentUser.first_name} {currentUser.last_name}
+              Welcome, {currentUser.first_name} {currentUser.last_name}!
             </p>
           )}
         </div>

@@ -104,29 +104,45 @@ export const AutonomyList: React.FC<Props> = ({ currentUser }) => {
               </p>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', color: '#666' }}>
-              <p>No autonomy level has been assigned yet.</p>
+            <div style={{ 
+              maxWidth: '800px',
+              margin: '0 auto',
+              padding: '2rem',
+              backgroundColor: '#2a2a2a',
+              borderRadius: '8px',
+              textAlign: 'center'
+            }}>
+              <h2 style={{ 
+                color: '#fff',
+                marginBottom: '1.5rem',
+                fontSize: '1.75rem'
+              }}>
+                Current Autonomy Level
+              </h2>
+              <p style={{ 
+                color: '#ccc',
+                fontSize: '1.1rem',
+                margin: 0
+              }}>
+                No autonomy level has been assigned yet. Please check with your teacher.
+              </p>
             </div>
           )}
         </div>
       ) : (
-        <div>
-          <h2>All Autonomy Levels</h2>
-          <div style={{ display: 'grid', gap: '1rem', padding: '1rem' }}>
-            {autonomies.map(autonomy => (
-              <div 
-                key={autonomy.id}
-                style={{
-                  backgroundColor: '#2a2a2a',
-                  padding: '1.5rem',
-                  borderRadius: '6px'
-                }}
-              >
-                <h3 style={{ color: '#fff' }}>Level {autonomy.id}: {autonomy.name}</h3>
-                <p style={{ color: '#ccc' }}>{autonomy.description}</p>
-              </div>
-            ))}
-          </div>
+        <div style={{ 
+          maxWidth: '800px',
+          margin: '0 auto',
+          padding: '2rem',
+          textAlign: 'center'
+        }}>
+          <p style={{ 
+            color: '#ccc',
+            fontSize: '1.1rem',
+            margin: 0
+          }}>
+            Nothing to see here.
+          </p>
         </div>
       )}
     </div>
