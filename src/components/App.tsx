@@ -2,6 +2,7 @@ import { AutonomyList } from './AutonomyList';
 import { Auth } from './Auth';
 import { ResetPassword } from './ResetPassword';
 import { StudentGrowthChart } from './StudentGrowthChart';
+import { WellspringPulseCheck } from './WellspringPulseCheck';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { useEffect, useState } from 'react';
@@ -92,7 +93,12 @@ function App() {
         </div>
       )}
       
-      {currentUser?.role_id === 3 && <StudentGrowthChart />}
+      {currentUser?.role_id === 3 && (
+        <>
+          <StudentGrowthChart />
+          <WellspringPulseCheck currentUser={currentUser} />
+        </>
+      )}
       <AutonomyList currentUser={currentUser} />
     </div>
   );

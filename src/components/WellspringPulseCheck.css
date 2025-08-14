@@ -1,0 +1,41 @@
+.wellspring-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.wellspring-pulse-check {
+  text-align: center;
+}
+
+.pulse-check-title {
+  color: #0078C8;  /* Crossroads blue */
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+.pulse-check-description {
+  color: #666;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.pulse-check-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #0078C8;  /* Crossroads blue */
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.pulse-check-link:hover {
+  background-color: #005c9e;  /* Slightly darker shade of Crossroads blue */
+}
