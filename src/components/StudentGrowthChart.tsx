@@ -71,6 +71,15 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
         mode: 'point' as const,
         intersect: true,
         position: 'nearest' as const,
+        xAlign: (context: any) => {
+          const chart = context.chart;
+          const tooltipWidth = window.innerWidth < 768 ? 240 : 400;
+          const position = chart.canvas.getBoundingClientRect();
+          const tooltipX = context.tooltip.x;
+          
+          // If tooltip would go off the right side
+          return tooltipX + tooltipWidth > position.right ? 'left' : 'right';
+        },
         callbacks: {
           title: (tooltipItems: any[]) => {
             const currentScore = tooltipItems[0].raw;
@@ -92,7 +101,7 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
               let currentLine = '';
               
               words.forEach(word => {
-                if (currentLine.length + word.length > 60) { // Reduced line length for mobile
+                if (currentLine.length + word.length > (window.innerWidth < 768 ? 45 : 60)) { // Shorter lines on mobile
                   result.push(currentLine);
                   currentLine = word;
                 } else {
@@ -110,9 +119,9 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
           label: () => ''
         },
         backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        padding: 12,
-        boxWidth: window.innerWidth < 768 ? 280 : 400, // Responsive width
-        boxPadding: 3,
+        padding: window.innerWidth < 768 ? 8 : 12,
+        boxWidth: window.innerWidth < 768 ? 240 : 400, // Reduced width on mobile
+        boxPadding: window.innerWidth < 768 ? 2 : 3,
         titleFont: {
           weight: 'bold' as const,
           size: window.innerWidth < 768 ? 12 : 14 // Smaller font on mobile
