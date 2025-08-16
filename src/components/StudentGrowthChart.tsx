@@ -67,6 +67,10 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
       },
       tooltip: {
         enabled: true,
+        events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
+        mode: 'nearest',
+        intersect: true,
+        position: 'nearest',
         callbacks: {
           title: (tooltipItems: any[]) => {
             const currentScore = tooltipItems[0].raw;
@@ -88,7 +92,7 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
               let currentLine = '';
               
               words.forEach(word => {
-                if (currentLine.length + word.length > 80) {
+                if (currentLine.length + word.length > 60) { // Reduced line length for mobile
                   result.push(currentLine);
                   currentLine = word;
                 } else {
@@ -105,29 +109,35 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
           beforeLabel: () => '',
           label: () => ''
         },
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: 16,
-        boxWidth: 400,
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: 12,
+        boxWidth: window.innerWidth < 768 ? 280 : 400, // Responsive width
         boxPadding: 3,
         titleFont: {
           weight: 'bold' as const,
-          size: 14
+          size: window.innerWidth < 768 ? 12 : 14 // Smaller font on mobile
         },
         bodyFont: {
-          size: 13
+          size: window.innerWidth < 768 ? 11 : 13 // Smaller font on mobile
         },
-        bodySpacing: 8,
+        bodySpacing: 6,
         displayColors: false,
         bodyAlign: 'left' as const,
         titleAlign: 'left' as const
       }
     },
     maintainAspectRatio: false,
+    events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
     onHover: (event: any, elements: any[]) => {
       const target = event.native?.target;
       if (target) {
         target.style.cursor = elements.length ? 'pointer' : 'default';
       }
+    },
+    interaction: {
+      mode: 'nearest',
+      intersect: true,
+      axis: 'xy'
     }
   };
 
