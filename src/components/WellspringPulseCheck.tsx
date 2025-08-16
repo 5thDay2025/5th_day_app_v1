@@ -21,7 +21,7 @@ export const WellspringPulseCheck: React.FC<Props> = ({ currentUser }) => {
           Take a moment to reflect on your wellbeing and growth.
         </p>
         <a 
-          href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
+          href="https://forms.gle/iqVVwdQm6ZwrdDqb9" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="pulse-check-link"

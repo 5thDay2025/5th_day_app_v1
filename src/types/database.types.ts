@@ -24,6 +24,59 @@ export interface StudentAutonomyScore {
   autonomy_grade?: AutonomyGrade;
 }
 
+export interface FocusArea {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  description?: string;
+}
+
+export interface Course {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+}
+
+export interface CourseStudent {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  student_id: string;
+  course_id: string;
+  course?: Course;
+}
+
+export interface CourseFocusArea {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  course_id: string;
+  focus_area_id: string;
+  course?: Course;
+  focus_area?: FocusArea;
+}
+
+export interface FocusAreaGrade {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  score: number;
+}
+
+export interface StudentFocusAreaScore {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  student_id: string;
+  course_focus_area_id: string;
+  focus_area_grade_id: string;
+  course_focus_area?: CourseFocusArea;
+  focus_area_grade?: FocusAreaGrade;
+}
+
 export interface User {
   id: string;
   created_at: string;

@@ -95,7 +95,7 @@ function App() {
       
       {currentUser?.role_id === 3 && (
         <>
-          <StudentGrowthChart />
+          <StudentGrowthChart currentUser={currentUser} />
           <WellspringPulseCheck currentUser={currentUser} />
         </>
       )}

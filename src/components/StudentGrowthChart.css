@@ -26,3 +26,13 @@
   height: 400px;
   width: 100%;
 }
+
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: rgba(220, 53, 69, 0.1);
+  border-radius: 4px;
+}
