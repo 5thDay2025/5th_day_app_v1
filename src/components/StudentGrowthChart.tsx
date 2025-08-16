@@ -67,10 +67,10 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
       },
       tooltip: {
         enabled: true,
-        events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
-        mode: 'nearest',
+        events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'] as ('mousemove' | 'mouseout' | 'click' | 'touchstart' | 'touchmove')[],
+        mode: 'point' as const,
         intersect: true,
-        position: 'nearest',
+        position: 'nearest' as const,
         callbacks: {
           title: (tooltipItems: any[]) => {
             const currentScore = tooltipItems[0].raw;
@@ -127,7 +127,7 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
       }
     },
     maintainAspectRatio: false,
-    events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
+    events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'] as ('mousemove' | 'mouseout' | 'click' | 'touchstart' | 'touchmove')[],
     onHover: (event: any, elements: any[]) => {
       const target = event.native?.target;
       if (target) {
@@ -135,9 +135,8 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
       }
     },
     interaction: {
-      mode: 'nearest',
-      intersect: true,
-      axis: 'xy'
+      mode: 'point' as const,
+      intersect: true
     }
   };
 
