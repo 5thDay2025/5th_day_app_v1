@@ -153,8 +153,9 @@ export const Auth: React.FC = () => {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="password-toggle"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {showPassword ? '⊖' : '⊕'}
+              {showPassword ? 'Hide' : 'Show'}
             </button>
           </div>
         </div>

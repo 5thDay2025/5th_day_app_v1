@@ -22,7 +22,7 @@ export const useCurrentUser = (email: string | undefined) => {
       try {
         const { data, error } = await supabase
           .from('user')
-          .select('id, created_at, updated_at, first_name, last_name, email, role_id, grade_level_id')
+          .select('id, created_at, updated_at, first_name, last_name, email, role_id, grade_level_id, google_drive_link')
           .eq('email', email)
           .single();
 

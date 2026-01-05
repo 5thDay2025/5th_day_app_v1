@@ -49,15 +49,30 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
   };
 
   const options = {
+    layout: {
+      padding: {
+        top: 5,
+        bottom: 5,
+        left: 5,
+        right: 5
+      }
+    },
     scales: {
       r: {
         angleLines: {
           display: true
         },
-        min: 6,
+        min: 5,
         max: 10,
         ticks: {
           stepSize: 1
+        },
+        pointLabels: {
+          display: true,
+          font: {
+            size: 13
+          },
+          padding: 15
         }
       }
     },
@@ -82,36 +97,37 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
         },
         callbacks: {
           title: (tooltipItems: any[]) => {
-            const currentScore = tooltipItems[0].raw;
-            // Find all areas with the same score and sort them alphabetically by name
-            const areasWithSameScore = focusAreas
-              .filter((_, idx) => focusAreaScores.get(focusAreas[idx].id) === currentScore)
-              .sort((a, b) => a.name.localeCompare(b.name));
+            if (tooltipItems.length === 0) return [];
             
-            // Return all matching focus areas and their descriptions
+            const tooltipItem = tooltipItems[0];
+            const dataIndex = tooltipItem.dataIndex;
+            const currentScore = tooltipItem.raw;
+            
+            // Get only the specific focus area being hovered
+            const area = focusAreas[dataIndex];
+            if (!area) return [];
+            
             const result: string[] = [];
-            areasWithSameScore.forEach((area, i) => {
-              if (i > 0) result.push(''); // Add spacing between areas
-              result.push(area.name);
-              result.push(`Score: ${currentScore}`);
-              
-              // Word wrap the description
-              const description = area.description || 'No description available';
-              const words = description.split(' ');
-              let currentLine = '';
-              
-              words.forEach(word => {
-                if (currentLine.length + word.length > (window.innerWidth < 768 ? 45 : 60)) { // Shorter lines on mobile
-                  result.push(currentLine);
-                  currentLine = word;
-                } else {
-                  currentLine = currentLine ? `${currentLine} ${word}` : word;
-                }
-              });
-              if (currentLine) {
+            result.push(area.name);
+            result.push(`Score: ${currentScore}`);
+            result.push(''); // Add spacing between score and description
+            
+            // Word wrap the description
+            const description = area.description || 'No description available';
+            const words = description.split(' ');
+            let currentLine = '';
+            
+            words.forEach(word => {
+              if (currentLine.length + word.length > (window.innerWidth < 768 ? 45 : 60)) { // Shorter lines on mobile
                 result.push(currentLine);
+                currentLine = word;
+              } else {
+                currentLine = currentLine ? `${currentLine} ${word}` : word;
               }
             });
+            if (currentLine) {
+              result.push(currentLine);
+            }
             
             return result;
           },

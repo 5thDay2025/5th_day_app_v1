@@ -2,6 +2,7 @@ import { AutonomyList } from './AutonomyList';
 import { Auth } from './Auth';
 import { ResetPassword } from './ResetPassword';
 import { StudentGrowthChart } from './StudentGrowthChart';
+import { StudentGoogleDrive } from './StudentGoogleDrive';
 import { WellspringPulseCheck } from './WellspringPulseCheck';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -98,6 +99,9 @@ function App() {
           <StudentGrowthChart currentUser={currentUser} />
           <WellspringPulseCheck currentUser={currentUser} />
         </>
+      )}
+      {currentUser?.role_id === 3 && (
+        <StudentGoogleDrive currentUser={currentUser} />
       )}
       <AutonomyList currentUser={currentUser} />
     </div>

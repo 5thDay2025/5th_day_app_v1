@@ -1,7 +1,7 @@
 .student-growth-chart {
   max-width: 800px;
   margin: 2rem auto;
-  padding: 2rem;
+  padding: 1.5rem;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -19,12 +19,25 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  padding: 0;
+  height: 500px;
+  width: 100%;
+  position: relative;
+  margin: 0 auto;
 }
 
-.chart-container {
-  height: 400px;
-  width: 100%;
+.chart-container > div {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 
