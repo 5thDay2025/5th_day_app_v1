@@ -95,4 +95,13 @@ export interface StudentGoogleDrive {
   updated_at: string;
   student_id: string;
   google_drive_link: string;
+}
+
+export interface StudentFocusAreaSelfSelectionScore {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  student_id: string;
+  focus_area_id: string;
+  focus_area_grade_id: string;
 } 

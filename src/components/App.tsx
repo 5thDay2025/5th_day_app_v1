@@ -3,6 +3,7 @@ import { Auth } from './Auth';
 import { ResetPassword } from './ResetPassword';
 import { StudentGrowthChart } from './StudentGrowthChart';
 import { StudentGoogleDrive } from './StudentGoogleDrive';
+import { StudentSelfSelectionSurvey } from './StudentSelfSelectionSurvey';
 import { WellspringPulseCheck } from './WellspringPulseCheck';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -97,6 +98,7 @@ function App() {
       {currentUser?.role_id === 3 && (
         <>
           <StudentGrowthChart currentUser={currentUser} />
+          <StudentSelfSelectionSurvey currentUser={currentUser} />
           <WellspringPulseCheck currentUser={currentUser} />
         </>
       )}
