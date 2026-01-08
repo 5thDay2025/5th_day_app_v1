@@ -113,18 +113,22 @@ export const StudentSelfSelectionSurvey: React.FC<Props> = ({ currentUser }) => 
         });
         setFocusAreaGrades(gradeMap);
 
-        // Fetch last completion date (get the most recent created_at from any response)
+        // Fetch last completion date (get the most recent updated_at, or created_at if updated_at is null)
         const { data: lastSurveys, error: surveyError } = await supabase
           .from('student_focus_area_self_selection_score')
-          .select('created_at')
+          .select('updated_at, created_at')
           .eq('student_id', currentUser.id)
-          .order('created_at', { ascending: false })
+          .order('updated_at', { ascending: false, nullsFirst: false })
           .limit(1);
 
         if (surveyError && surveyError.code !== 'PGRST116') {
           console.error('Error fetching last survey:', surveyError);
-        } else if (lastSurveys && lastSurveys.length > 0 && lastSurveys[0]?.created_at) {
-          setLastCompleted(lastSurveys[0].created_at);
+        } else if (lastSurveys && lastSurveys.length > 0) {
+          // Use updated_at if available, otherwise fall back to created_at
+          const timestamp = lastSurveys[0].updated_at || lastSurveys[0].created_at;
+          if (timestamp) {
+            setLastCompleted(timestamp);
+          }
         }
       } catch (err) {
         console.error('Error fetching survey data:', err);
@@ -163,17 +167,23 @@ export const StudentSelfSelectionSurvey: React.FC<Props> = ({ currentUser }) => 
     if (!currentUser?.id) return;
     
     try {
+      // Get the most recent updated_at timestamp (or created_at if updated_at is null)
+      // This represents when the survey was last completed/updated
       const { data: lastSurveys, error: surveyError } = await supabase
         .from('student_focus_area_self_selection_score')
-        .select('created_at')
+        .select('updated_at, created_at')
         .eq('student_id', currentUser.id)
-        .order('created_at', { ascending: false })
+        .order('updated_at', { ascending: false, nullsFirst: false })
         .limit(1);
 
       if (surveyError && surveyError.code !== 'PGRST116') {
         console.error('Error fetching last survey:', surveyError);
-      } else if (lastSurveys && lastSurveys.length > 0 && lastSurveys[0]?.created_at) {
-        setLastCompleted(lastSurveys[0].created_at);
+      } else if (lastSurveys && lastSurveys.length > 0) {
+        // Use updated_at if available, otherwise fall back to created_at
+        const timestamp = lastSurveys[0].updated_at || lastSurveys[0].created_at;
+        if (timestamp) {
+          setLastCompleted(timestamp);
+        }
       }
     } catch (err) {
       console.error('Error fetching last completed:', err);
@@ -271,12 +281,14 @@ export const StudentSelfSelectionSurvey: React.FC<Props> = ({ currentUser }) => 
           if (error) throw error;
         } else {
           // Insert new record
+          const now = new Date().toISOString();
           const { error } = await supabase
             .from('student_focus_area_self_selection_score')
             .insert({
               student_id: currentUser.id,
               focus_area_id: response.focus_area_id,
-              focus_area_grade_id: response.focus_area_grade_id
+              focus_area_grade_id: response.focus_area_grade_id,
+              updated_at: now
             });
 
           if (error) throw error;
@@ -287,8 +299,8 @@ export const StudentSelfSelectionSurvey: React.FC<Props> = ({ currentUser }) => 
       setIsCompleted(true);
       setSaving(false);
       
-      // Update last completed date
-      setLastCompleted(new Date().toISOString());
+      // Fetch the actual updated_at timestamp from the database
+      await fetchLastCompleted();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save survey');
       setSaving(false);
@@ -296,13 +308,25 @@ export const StudentSelfSelectionSurvey: React.FC<Props> = ({ currentUser }) => 
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Ensure the date string is treated as UTC if it doesn't have timezone info
+    let date: Date;
+    if (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-', 10)) {
+      // Already has timezone info
+      date = new Date(dateString);
+    } else {
+      // Assume UTC if no timezone specified (Supabase timestamps are UTC)
+      date = new Date(dateString + 'Z');
+    }
+    
+    // Format in CST timezone (America/Chicago handles both CST and CDT)
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: 'numeric',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'America/Chicago',
+      timeZoneName: 'short' // Shows CST or CDT
     });
   };
 
