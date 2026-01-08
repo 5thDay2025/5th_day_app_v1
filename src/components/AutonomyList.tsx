@@ -9,9 +9,7 @@ interface Props {
 }
 
 export const AutonomyList: React.FC<Props> = ({ currentUser }) => {
-  console.log('AutonomyList component rendering');
-
-  const [_, setAutonomies] = React.useState<Autonomy[]>([]);
+  const [, setAutonomies] = React.useState<Autonomy[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   

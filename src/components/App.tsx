@@ -100,10 +100,8 @@ function App() {
           <StudentGrowthChart currentUser={currentUser} />
           <StudentSelfSelectionSurvey currentUser={currentUser} />
           <WellspringPulseCheck currentUser={currentUser} />
+          <StudentGoogleDrive currentUser={currentUser} />
         </>
-      )}
-      {currentUser?.role_id === 3 && (
-        <StudentGoogleDrive currentUser={currentUser} />
       )}
       <AutonomyList currentUser={currentUser} />
     </div>

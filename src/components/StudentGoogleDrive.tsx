@@ -115,9 +115,6 @@ export const StudentGoogleDrive: React.FC<Props> = ({ currentUser }) => {
               <button className="modal-close" onClick={handleCloseModal}>×</button>
             </div>
             <div className="modal-body">
-              {/* <label htmlFor="drive-link-input" className="modal-label">
-                Google Drive Link:
-              </label> */}
               <input
                 id="drive-link-input"
                 type="url"

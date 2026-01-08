@@ -187,9 +187,9 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
             
             // Show different label based on which dataset
             if (datasetIndex === 0) {
-              result.push(`Course Score: ${currentScore}`);
-            } else {
               result.push(`Self Selection: ${currentScore}`);
+            } else {
+              result.push(`Course Score: ${currentScore}`);
             }
             result.push(''); // Add spacing between score and description
             
