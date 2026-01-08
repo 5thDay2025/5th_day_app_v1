@@ -289,11 +289,6 @@ export const StudentSelfSelectionSurvey: React.FC<Props> = ({ currentUser }) => 
       
       // Update last completed date
       setLastCompleted(new Date().toISOString());
-      
-      // Close after showing completion message
-      setTimeout(() => {
-        handleCloseModal();
-      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save survey');
       setSaving(false);
@@ -357,12 +352,18 @@ export const StudentSelfSelectionSurvey: React.FC<Props> = ({ currentUser }) => 
             {isCompleted ? (
               <div className="survey-completion">
                 <h3 className="completion-title">Survey Completed!</h3>
-                <p className="completion-message">Thank you for your reflections. Your responses have been saved.</p>
+                <p className="completion-message">Thank you for your reflections. Your responses have been saved. Refresh the page to update the radar graph.</p>
+                <button 
+                  onClick={handleCloseModal}
+                  className="survey-modal-button completion-close"
+                >
+                  Close
+                </button>
               </div>
             ) : (
               <>
                 <div className="survey-modal-header">
-                  <h3 className="survey-modal-title">Student Survey</h3>
+                  <h3 className="survey-modal-title">Complete Self Selection Survey</h3>
                   <button className="survey-modal-close" onClick={handleCloseModal}>×</button>
                 </div>
                 

@@ -23,6 +23,8 @@ ChartJS.register(
 
 import { User } from '../types/database.types';
 import { useFocusAreas } from '../hooks/useSupabase';
+import { supabase } from '../lib/supabase';
+import { useState, useEffect } from 'react';
 
 interface Props {
   currentUser: User | null;
@@ -30,11 +32,82 @@ interface Props {
 
 export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
   const { focusAreas, focusAreaScores, loading, error } = useFocusAreas(currentUser?.id);
+  const [selfSelectionScores, setSelfSelectionScores] = useState<Map<string, number>>(new Map());
+  const [loadingSelfSelection, setLoadingSelfSelection] = useState(true);
+
+  // Fetch self-selection survey scores
+  useEffect(() => {
+    const fetchSelfSelectionScores = async () => {
+      if (!currentUser?.id) {
+        setLoadingSelfSelection(false);
+        return;
+      }
+
+      try {
+        // Fetch self-selection scores with focus area grade info
+        const { data: selfSelectionData, error: selfSelectionError } = await supabase
+          .from('student_focus_area_self_selection_score')
+          .select(`
+            focus_area_id,
+            focus_area_grade_id,
+            focus_area_grade!inner (
+              name
+            )
+          `)
+          .eq('student_id', currentUser.id);
+
+        if (selfSelectionError) {
+          console.error('Error fetching self-selection scores:', selfSelectionError);
+          setLoadingSelfSelection(false);
+          return;
+        }
+
+        // Map focus_area_id to score (grade name is the score number)
+        const scoresMap = new Map<string, number>();
+        selfSelectionData?.forEach(item => {
+          const focusAreaGrade = item.focus_area_grade as unknown as { name: number | string } | null;
+          const score = focusAreaGrade?.name 
+            ? (typeof focusAreaGrade.name === 'number' ? focusAreaGrade.name : parseInt(String(focusAreaGrade.name)))
+            : null;
+          
+          if (item.focus_area_id && score !== null && !isNaN(score)) {
+            scoresMap.set(item.focus_area_id, score);
+          }
+        });
+
+        setSelfSelectionScores(scoresMap);
+      } catch (err) {
+        console.error('Error fetching self-selection scores:', err);
+      } finally {
+        setLoadingSelfSelection(false);
+      }
+    };
+
+    fetchSelfSelectionScores();
+  }, [currentUser?.id]);
 
   const data = {
     labels: focusAreas.map(area => area.name),
     datasets: [
       {
+        label: 'Self Selection',
+        data: focusAreas.map(area => {
+          const selfScore = selfSelectionScores.get(area.id);
+          return selfScore !== undefined ? selfScore : null;
+        }),
+        backgroundColor: 'rgba(232, 119, 34, 0.15)',
+        borderColor: 'rgba(232, 119, 34, 1)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(232, 119, 34, 1)',
+        pointBorderColor: '#fff',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: 'rgba(232, 119, 34, 1)',
+        pointHoverBorderColor: '#fff',
+        order: 0 // Lower order = renders first (behind)
+      },
+      {
+        label: 'Course Scores',
         data: focusAreas.map(area => focusAreaScores.get(area.id) || 6), // Use median score or default to 6
         backgroundColor: 'rgba(141, 198, 63, 0.2)',
         borderColor: 'rgba(141, 198, 63, 1)',
@@ -43,7 +116,8 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
         pointBorderColor: '#fff',
         pointHoverRadius: 5,
         pointHoverBackgroundColor: 'rgba(141, 198, 63, 1)',
-        pointHoverBorderColor: '#fff'
+        pointHoverBorderColor: '#fff',
+        order: 1 // Higher order = renders last (on top)
       }
     ]
   };
@@ -101,6 +175,7 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
             
             const tooltipItem = tooltipItems[0];
             const dataIndex = tooltipItem.dataIndex;
+            const datasetIndex = tooltipItem.datasetIndex;
             const currentScore = tooltipItem.raw;
             
             // Get only the specific focus area being hovered
@@ -109,7 +184,13 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
             
             const result: string[] = [];
             result.push(area.name);
-            result.push(`Score: ${currentScore}`);
+            
+            // Show different label based on which dataset
+            if (datasetIndex === 0) {
+              result.push(`Course Score: ${currentScore}`);
+            } else {
+              result.push(`Self Selection: ${currentScore}`);
+            }
             result.push(''); // Add spacing between score and description
             
             // Word wrap the description
@@ -165,7 +246,7 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
     }
   };
 
-  if (loading) {
+  if (loading || loadingSelfSelection) {
     return (
       <div className="student-growth-chart">
         <h2 className="chart-title">Loading...</h2>
@@ -196,6 +277,16 @@ export const StudentGrowthChart: React.FC<Props> = ({ currentUser }) => {
       <h2 className="chart-title">Student Growth Chart</h2>
       <div className="chart-container">
         <Radar data={data} options={options} />
+      </div>
+      <div className="chart-legend">
+        <div className="legend-item">
+          <span className="legend-color" style={{ backgroundColor: 'rgba(232, 119, 34, 1)' }}></span>
+          <span className="legend-label">Self Selection Survey Scores</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-color" style={{ backgroundColor: 'rgba(141, 198, 63, 1)' }}></span>
+          <span className="legend-label">Focus Area Scores</span>
+        </div>
       </div>
     </div>
   );

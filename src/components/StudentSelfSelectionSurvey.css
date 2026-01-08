@@ -260,5 +260,15 @@
   color: #666;
   font-size: 1.1rem;
   line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.completion-close {
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
